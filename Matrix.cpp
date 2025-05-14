@@ -36,26 +36,27 @@ void write(const string& path, const Vector& x)
     for (Eigen::Index i = 0; i < x.size(); ++i) f << x(i) << '\n';
 }
 
-Vector Guess(Matrix A)          // принимаем копию, чтобы можно было менять
+Vector Guess(Matrix& aug)          // принимаем копию, чтобы можно было менять
 {
-    int n = augmented.rows();
-    int m = augmented.cols();
+    int n = aug.rows();
+    int m = aug.cols();
 
-    Vector b = augmented.col(m - 1);
-    Matrix A = augmented.block(0, 0, n, n);
+    Vector b = aug.col(m - 1);
+    Matrix A = aug.block(0, 0, n, n);
     
     for (int k = 0; k < n; ++k)
     {
         // частичный поиск главного элемента
-        int p = A.col(k).segment(k, n - k).cwiseAbs().maxCoeff(&p);
+        int p;
+        A.col(k).segment(k, n - k).cwiseAbs().maxCoeff(&p);
         p += k;
-        swap(A.row(k), A.row(p));
+        A.row(k).swap(A.row(p)); 
         swap(b(k), b(p));
         
-        // 2.2 вектор коэффициентов
+        // вектор коэффициентов
         Vector factor = A.col(k).segment(k+1, n-k-1) / A(k,k);
 
-        // 2.3 обнуляем под главной диагональю
+        // обнуляем под главной диагональю
         A.block(k+1, k+1, n-k-1, n-k-1).noalias() -=
             factor * A.row(k).segment(k+1, n-k-1);
         b.segment(k+1, n-k-1).noalias() -= factor * b(k);
