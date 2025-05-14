@@ -10,53 +10,55 @@
 using Matrix = Eigen::MatrixXd;
 using Vector = Eigen::VectorXd;
 
-Matrix read(const std::string& path)
+using namespace std;
+
+Matrix read(const string& path)
 {
-    std::ifstream f(path);
-    if (!f) throw std::runtime_error("CSV not found: " + path);
+    ifstream f(path);
+    if (!f) throw runtime_error("CSV not found: " + path);
 
-    std::vector<double> values;
-    std::size_t rows = 0, cols = 0;
-    std::string line, cell;
+    vector<double> values;
+    size_t rows = 0, cols = 0;
+    string line, cell;
 
-    while (std::getline(f, line)) {
+    while (getline(f, line)) {
         ++rows;
-        std::stringstream ss(line);
-        while (std::getline(ss, cell, ',')) values.push_back(std::stod(cell));
+        stringstream ss(line);
+        while (getline(ss, cell, ',')) values.push_back(stod(cell));
         if (!cols) cols = values.size() / rows;
     }
     return Eigen::Map<Matrix>(values.data(), rows, cols);
 }
 
-void write(const std::string& path, const Vector& x)
+void write(const string& path, const Vector& x)
 {
-    std::ofstream f(path);
+    ofstream f(path);
     for (Eigen::Index i = 0; i < x.size(); ++i) f << x(i) << '\n';
 }
 
 Vector Guess(Matrix A)          // принимаем копию, чтобы можно было менять
 {
-    const int n = A.rows();
-    Vector b = A.rightCols<1>();
-    A = A.leftCols(n);         // отбросили правый столбец из A
+    int n = augmented.rows();
+    int m = augmented.cols();
 
+    Vector b = augmented.col(m - 1);
+    Matrix A = augmented.block(0, 0, n, n);
+    
     for (int k = 0; k < n; ++k)
     {
-        // поиск главного элемента
-        int p;
-        A.col(k).segment(k, n - k).cwiseAbs().maxCoeff(&p);
+        // частичный поиск главного элемента
+        int p = A.col(k).segment(k, n - k).cwiseAbs().maxCoeff(&p);
         p += k;
-        if (std::abs(A(p, k)) < 1e-12) throw std::runtime_error("Singular!");
+        swap(A.row(k), A.row(p));
+        swap(b(k), b(p));
+        
+        // 2.2 вектор коэффициентов
+        Vector factor = A.col(k).segment(k+1, n-k-1) / A(k,k);
 
-        // перестановка
-        A.row(k).swap(A.row(p));
-        std::swap(b(k), b(p));
-
-        // коэффициенты и зануление ниже диагонали
-        Vector factor = A.col(k).segment(k + 1, n - k - 1) / A(k, k);
-        A.block(k + 1, k, n - k - 1, n - k).noalias()
-            -= factor * A.row(k).segment(k, n - k);
-        b.segment(k + 1, n - k - 1).noalias() -= factor * b(k);
+        // 2.3 обнуляем под главной диагональю
+        A.block(k+1, k+1, n-k-1, n-k-1).noalias() -=
+            factor * A.row(k).segment(k+1, n-k-1);
+        b.segment(k+1, n-k-1).noalias() -= factor * b(k);
     }
 
     // обратный ход
