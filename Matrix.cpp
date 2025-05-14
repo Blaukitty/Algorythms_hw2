@@ -36,7 +36,7 @@ void write(const string& path, const Vector& x)
     for (Eigen::Index i = 0; i < x.size(); ++i) f << x(i) << '\n';
 }
 
-Vector Guess(const Matrix& aug)          
+Vector Guess(const Matrix M)          
 {
     int n = M.rows();  
     Vector b = M.col(n);
