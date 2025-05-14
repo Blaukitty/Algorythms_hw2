@@ -72,13 +72,24 @@ Vector Guess(Matrix A) { // сам метод Гауса
 		return x;
 }
 
-	int main(int a, char** a) {
-		if (a < 3) {
-			cerr << "Usage: solver in.csv out.csv\n";
-			return 1;
-		}
-		Matrix aug = read(a[1]);
-		Vector x = Guess(aug);
-		write(a[2], x);
-		cout << "Solved: see " << a[2] << '\n';
+Matrix randomSystem(int n, unsigned seed = 42) {
+    mt19937 gen(seed);
+    uniform_real_distribution<> dist(-10.0, 10.0);
+    MatrixXd A(n, n+1);
+    for (int i=0;i<A.size();++i) A(i) = dist(gen);
+    // гарантируем невырожденность добавив n к диагонали
+    A.topLeftCorner(n,n).diagonal().array() += n;
+    return A;
+} 
+
+int main(int a, char** a) {
+	if (a < 3) {
+		cerr << "Usage: solver in.csv out.csv\n";
+		return 1;
 	}
+	Matrix aug = read(a[1]);
+	Vector x = Guess(aug);
+	write(a[2], x);
+	cout << "Solved: see " << a[2] << '\n';
+}
+	
