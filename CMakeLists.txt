@@ -9,7 +9,12 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(Catch2 3 REQUIRED)
 
 add_library(gauss_lib Matrix.cpp)
-target_link_libraries(gauss_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(gauss_lib
+    PUBLIC ${EIGEN3_INCLUDE_DIR}
+)
+target_link_libraries(gauss_lib
+    PUBLIC Eigen3::Eigen
+)
 
 add_executable(solver solver_main.cpp)
 target_link_libraries(solver PRIVATE gauss_lib)
