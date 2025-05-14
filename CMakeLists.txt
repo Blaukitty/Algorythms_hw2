@@ -3,7 +3,6 @@ project(GaussSolver LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(Catch2 3 REQUIRED)
@@ -23,7 +22,6 @@ enable_testing()
 add_executable(gauss_tests tests_gauss.cpp)
 target_link_libraries(gauss_tests
     PRIVATE gauss_lib 
-    Catch2::Catch2
     Catch2::Catch2WithMain
 )
 add_test(NAME GaussTests COMMAND gauss_tests)
