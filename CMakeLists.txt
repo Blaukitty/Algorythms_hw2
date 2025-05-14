@@ -6,23 +6,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
-find_package(Catch2 3 REQUIRED)         
+find_package(Catch2 3 REQUIRED)
 
-add_executable(solver
-    Matrix.cpp                           
-)
-target_link_libraries(solver PRIVATE Eigen3::Eigen)
+add_library(gauss_lib Matrix.cpp)
+target_link_libraries(gauss_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+add_executable(solver solver_main.cpp)
+target_link_libraries(solver PRIVATE gauss_lib)
 
 enable_testing()
-
-add_executable(gauss_tests
-    tests_gauss.cpp                     
-)
+add_executable(gauss_tests tests_gauss.cpp)
 target_link_libraries(gauss_tests
-    PRIVATE
-        Eigen3::Eigen
-        Catch2::Catch2                   
+    PRIVATE gauss_lib Catch2::Catch2
 )
-
 add_test(NAME GaussTests COMMAND gauss_tests)
