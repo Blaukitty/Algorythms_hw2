@@ -37,8 +37,8 @@ void write(const std::string& path, const Vector& x)
 Vector Guess(Matrix A)          // принимаем копию, чтобы можно было менять
 {
     const int n = A.rows();
-    Vector b = A.col(n - 1);
-    A.conservativeResize(n, n);         // отбросили правый столбец из A
+    Vector b = A.rightCols<1>();
+    A = A.leftCols(n);         // отбросили правый столбец из A
 
     for (int k = 0; k < n; ++k)
     {
