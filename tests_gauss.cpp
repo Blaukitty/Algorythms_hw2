@@ -1,7 +1,6 @@
-// test_gauss.cpp
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch_all.hpp>
-#include "Matrix.cpp"          
+#include "Matrix.hpp"          
 #include <Eigen/Dense>
 
 TEST_CASE("3×3 hand example") {
