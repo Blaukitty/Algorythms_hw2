@@ -1,15 +1,15 @@
 // Matrix.cpp
+#include "Matrix.hpp"
 #include <Eigen/Dense>
 #include <fstream>
 #include <sstream>
 #include <random>
-#include <algorithm>        // std::swap
+#include <algorithm>        
 #include <iostream>
 
 using Matrix = Eigen::MatrixXd;
 using Vector = Eigen::VectorXd;
 
-// ───────────────────────── CSV ─────────────────────────
 Matrix read(const std::string& path)
 {
     std::ifstream f(path);
@@ -34,8 +34,7 @@ void write(const std::string& path, const Vector& x)
     for (Eigen::Index i = 0; i < x.size(); ++i) f << x(i) << '\n';
 }
 
-// ───────────────────────── Гаусс ──────────────────────
-Vector Guess(Matrix A)          // принимаем **копию**, чтобы можно было менять
+Vector Guess(Matrix A)          // принимаем копию, чтобы можно было менять
 {
     const int n = A.rows();
     Vector b = A.col(n - 1);
@@ -70,7 +69,7 @@ Vector Guess(Matrix A)          // принимаем **копию**, чтобы
     return x;
 }
 
-// ─────────────────────── генератор ────────────────────
+
 Matrix randomSystem(int n, unsigned seed = 42)
 {
     if (n <= 0 || n > 4'000)
@@ -83,16 +82,4 @@ Matrix randomSystem(int n, unsigned seed = 42)
     for (int i = 0; i < A.size(); ++i) A(i) = dist(gen);
     A.topLeftCorner(n, n).diagonal().array() += n;   // невырожденность
     return A;
-}
-
-// ───────────────────────── main ───────────────────────
-int main(int argc, char** argv)
-{
-    if (argc < 3) {
-        std::cerr << "Usage: solver in.csv out.csv\n";
-        return 1;
-    }
-    Matrix aug = read(argv[1]);
-    Vector x   = Guess(aug);
-    write(argv[2], x);
 }
