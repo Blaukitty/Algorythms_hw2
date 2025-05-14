@@ -22,6 +22,8 @@ target_link_libraries(solver PRIVATE gauss_lib)
 enable_testing()
 add_executable(gauss_tests tests_gauss.cpp)
 target_link_libraries(gauss_tests
-    PRIVATE gauss_lib Catch2::Catch2
+    PRIVATE gauss_lib 
+    Catch2::Catch2
+    Catch2::Catch2WithMain
 )
 add_test(NAME GaussTests COMMAND gauss_tests)
