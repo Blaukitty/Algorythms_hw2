@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)   # header-only, но даёт include-dir
-find_package(Catch2 2 REQUIRED) 
+find_package(Catch2 3 REQUIRED) 
 target_link_libraries(gauss_tests PRIVATE Catch2::Catch2WithMain)               # ставится пакетом libcatch2-dev
 
 add_executable(solver src/Matrix.cpp)           
