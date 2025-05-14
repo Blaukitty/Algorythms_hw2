@@ -10,4 +10,5 @@ int main(int argc, char** argv)
     Matrix aug = read(argv[1]);
     Vector x   = Guess(aug);
     write(argv[2], x);
+    return 0;
 }
