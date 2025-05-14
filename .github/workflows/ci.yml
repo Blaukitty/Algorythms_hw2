@@ -17,7 +17,8 @@ jobs:
     - name: Install CMake and g++
       run: |
         sudo apt update && sudo apt install -y cmake g++
-        sudo apt install -y libeigen3-dev libcatch2-dev
+        sudo apt install -y cmake g++ build-essential \
+                        libeigen3-dev catch2
 
     - name: Configure Cmake
       run: cmake -S . -B build
