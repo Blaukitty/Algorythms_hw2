@@ -36,20 +36,22 @@ void write(const string& path, const Vector& x)
     for (Eigen::Index i = 0; i < x.size(); ++i) f << x(i) << '\n';
 }
 
-Vector Guess(const Matrix& aug)          // принимаем копию, чтобы можно было менять
+Vector Guess(const Matrix& aug)          
 {
-    int n = aug.rows();
-    int m = aug.cols();
+    int n = A.rows();  
+    Vector b = A.col(n);
 
-    Vector b = aug.col(m - 1);
-    Matrix A = aug.block(0, 0, n, n);
+    A.conservativeResize(n, n);
     
     for (int k = 0; k < n; ++k)
     {
-        // частичный поиск главного элемента
         int p;
         A.col(k).segment(k, n - k).cwiseAbs().maxCoeff(&p);
         p += k;
+
+        if (std::abs(A(p, k)) < 1e-12)
+            throw std::runtime_error("Singular!");
+        
         A.row(k).swap(A.row(p)); 
         swap(b(k), b(p));
         
@@ -57,9 +59,10 @@ Vector Guess(const Matrix& aug)          // принимаем копию, чт�
         Vector factor = A.col(k).segment(k+1, n-k-1) / A(k,k);
 
         // обнуляем под главной диагональю
-        A.block(k+1, k+1, n-k-1, n-k-1).noalias() -=
-            factor * A.row(k).segment(k+1, n-k-1);
-        b.segment(k+1, n-k-1).noalias() -= factor * b(k);
+        A.block(k+1, k, n-k-1, n-k)
+         .noalias() -= factor * A.row(k).segment(k, n-k);
+        b.segment(k+1, n-k-1)
+         .noalias() -= factor * b(k);
     }
 
     // обратный ход
