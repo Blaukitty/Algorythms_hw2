@@ -4,8 +4,8 @@
 #include <random>
 #include <iostream>
 
-using Eigen::Matrix;
-using Eigen::Vector;
+using Matrix = Eigen::MatrixXd;  
+using Vector = Eigen::VectorXd;
 using namespace std;
 
 Matrix read(const string& p) {
@@ -40,7 +40,7 @@ void write(const string& p, const Vector& x) {
 	}
 }
 
-Vector Guess(Matrix A) { // сам метод Гауса
+Vector Guess(const Matrix& A) { // сам метод Гауса
 	const int n = A.rows();
 	VectorXd b = A.col(n - 1);          // последний столбец
 	A.conservativeResize(n, n - 1);     // отбросили b из A
