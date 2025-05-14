@@ -83,6 +83,6 @@ Matrix randomSystem(int n, unsigned seed)
 
     Matrix M(n, n + 1);
     for (int i = 0; i < M.size(); ++i) M(i) = dist(gen);
-    A.topLeftCorner(n, n).diagonal().array() += n;   // невырожденность
+    M.topLeftCorner(n, n).diagonal().array() += n;   // невырожденность
     return M;
 }
