@@ -19,11 +19,11 @@ Matrix read(const string& path)
 
     vector<double> values;
     size_t rows = 0, cols = 0;
-    string line, cell;
-
+    string line;
     while (getline(f, line)) {
         ++rows;
         stringstream ss(line);
+        string cell;
         while (getline(ss, cell, ',')) values.push_back(stod(cell));
         if (!cols) cols = values.size() / rows;
     }
@@ -79,10 +79,10 @@ Matrix randomSystem(int n, unsigned seed)
         throw std::invalid_argument("n out of range (1‒4000)");
 
     std::mt19937 gen(seed);
-    std::uniform_real_distribution<> dist(-10.0, 10.0);
+    std::uniform_real_distribution<> dist(-10, 10);
 
-    Matrix A(n, n + 1);
-    for (int i = 0; i < A.size(); ++i) A(i) = dist(gen);
+    Matrix M(n, n + 1);
+    for (int i = 0; i < M.size(); ++i) M(i) = dist(gen);
     A.topLeftCorner(n, n).diagonal().array() += n;   // невырожденность
-    return A;
+    return M;
 }
