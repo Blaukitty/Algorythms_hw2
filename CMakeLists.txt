@@ -8,7 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)   # header-only, но даёт include-dir
 find_package(Catch2 3 REQUIRED)               # ставится пакетом libcatch2-dev
 
-add_executable(solver src/main.cpp)           # поправь путь, если иначе
+add_executable(solver src/Matrix.cpp)           
 target_link_libraries(solver PRIVATE Eigen3::Eigen)
 
 enable_testing()
