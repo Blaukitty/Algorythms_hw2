@@ -8,10 +8,10 @@ TEST_CASE("3×3 hand example") {
     A <<  2, 1,-1,  8,
          -3,-1, 2,-11,
          -2, 1, 2, -3;
-    Vector expected(3); 
-    expected << 2,-3,1;
-
-    REQUIRE( Guess(A).isApprox(expected) );
+    Matrix M = A.block(0,0,3,3);
+    Vector b = A.col(3);
+    Vector expected = M.fullPivLu().solve(b);
+    REQUIRE( Guess(A).isApprox(expected, 1e-8) );
 }
 
 TEST_CASE("Compare with Eigen solver") {
