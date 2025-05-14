@@ -36,45 +36,53 @@ void write(const string& path, const Vector& x)
     for (Eigen::Index i = 0; i < x.size(); ++i) f << x(i) << '\n';
 }
 
-Vector Guess(Matrix M)          
-{
-    int n = M.rows();  
+Vector Guess(Matrix M) {
+    // M — это расширенная матрица n×(n+1)
+    int n = M.rows();
+    // последний столбец — вектор свободных членов
     Vector b = M.col(n);
-
+    // первые n столбцов — сама квадратная матрица
     M.conservativeResize(n, n);
-    
-    for (int k = 0; k < n; ++k)
-    {
-        int p;
-        M.col(k).segment(k, n - k).cwiseAbs().maxCoeff(&p);
-        p += k;
 
-        if (abs(M(p, k)) < 1e-12)
-            throw std::runtime_error("Singular!");
-        
-        M.row(k).swap(M.row(p)); 
-        swap(b(k), b(p));
-        
-        // вектор коэффициентов
-        Vector factor = M.col(k).segment(k+1, n-k-1) / M(k,k);
+    // Прямой ход
+    for(int k = 0; k < n; ++k) {
+        // выбираем строку с максимальным элементом в столбце k
+        int rel_max;
+        M.col(k).segment(k, n-k)
+            .cwiseAbs()
+            .maxCoeff(&rel_max);
+        int p = k + rel_max;
+        // меняем местами строки k и p
+        M.row(k).swap(M.row(p));
+        std::swap(b(k), b(p));
 
-        // обнуляем под главной диагональю
-        M.block(k+1, k, n-k-1, n-k)
-         .noalias() -= factor * M.row(k).segment(k, n-k);
-        b.segment(k+1, n-k-1)
-         .noalias() -= factor * b(k);
+        double pivot = M(k,k);
+        if(std::abs(pivot) < 1e-12)
+            throw std::runtime_error("Singular matrix!");
+
+        // убираем элемент под диагональю
+        for(int i = k+1; i < n; ++i) {
+            double f = M(i,k) / pivot;
+            // вычитаем f * строка_k из строки_i (коэфф-ты)
+            M.row(i).segment(k, n-k) 
+              -= f * M.row(k).segment(k, n-k);
+            // и тот же f из b
+            b(i) -= f * b(k);
+        }
     }
 
-    // обратный ход
+    // Обратный ход
     Vector x(n);
-    for (int i = n - 1; i >= 0; --i) {
-        double s = M.row(i).segment(i + 1, n - i - 1)
-                         .dot(x.segment(i + 1, n - i - 1));
-        x(i) = (b(i) - s) / M(i, i);
+    for(int i = n-1; i >= 0; --i) {
+        double sum = 0;
+        for(int j = i+1; j < n; ++j) {
+            sum += M(i,j) * x(j);
+        }
+        x(i) = (b(i) - sum) / M(i,i);
     }
+
     return x;
 }
-
 
 Matrix randomSystem(int n, unsigned seed)
 {
