@@ -20,5 +20,5 @@ TEST_CASE("Compare with Eigen solver") {
     Vector x = Guess(sys);
     Matrix M = sys.block(0,0,n,n);
     Vector b = sys.col(n);
-    REQUIRE(x.isApprox(A.fullPivLu().solve(b), 1e-8));
+    REQUIRE(x.isApprox(M.fullPivLu().solve(b), 1e-8));
 }
