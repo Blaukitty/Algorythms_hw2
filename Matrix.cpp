@@ -70,7 +70,7 @@ Vector Guess(Matrix A)          // принимаем копию, чтобы м�
 }
 
 
-Matrix randomSystem(int n, unsigned seed = 42)
+Matrix randomSystem(int n, unsigned seed)
 {
     if (n <= 0 || n > 4'000)
         throw std::invalid_argument("n out of range (1‒4000)");
