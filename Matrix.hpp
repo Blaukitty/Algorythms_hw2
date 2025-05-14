@@ -6,5 +6,5 @@ using Vector = Eigen::VectorXd;
 
 Matrix  read (const std::string& path);
 void    write(const std::string& path, const Vector& x);
-Vector  Guess(const Matrix& aug);
+Vector  Guess(const Matrix M);
 Matrix  randomSystem(int n, unsigned seed = 42);
