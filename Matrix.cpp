@@ -38,29 +38,29 @@ void write(const string& path, const Vector& x)
 
 Vector Guess(const Matrix& aug)          
 {
-    int n = A.rows();  
-    Vector b = A.col(n);
+    int n = M.rows();  
+    Vector b = M.col(n);
 
-    A.conservativeResize(n, n);
+    M.conservativeResize(n, n);
     
     for (int k = 0; k < n; ++k)
     {
         int p;
-        A.col(k).segment(k, n - k).cwiseAbs().maxCoeff(&p);
+        M.col(k).segment(k, n - k).cwiseAbs().maxCoeff(&p);
         p += k;
 
-        if (std::abs(A(p, k)) < 1e-12)
+        if (abs(M(p, k)) < 1e-12)
             throw std::runtime_error("Singular!");
         
-        A.row(k).swap(A.row(p)); 
+        M.row(k).swap(M.row(p)); 
         swap(b(k), b(p));
         
         // вектор коэффициентов
-        Vector factor = A.col(k).segment(k+1, n-k-1) / A(k,k);
+        Vector factor = M.col(k).segment(k+1, n-k-1) / M(k,k);
 
         // обнуляем под главной диагональю
-        A.block(k+1, k, n-k-1, n-k)
-         .noalias() -= factor * A.row(k).segment(k, n-k);
+        M.block(k+1, k, n-k-1, n-k)
+         .noalias() -= factor * M.row(k).segment(k, n-k);
         b.segment(k+1, n-k-1)
          .noalias() -= factor * b(k);
     }
@@ -68,9 +68,9 @@ Vector Guess(const Matrix& aug)
     // обратный ход
     Vector x(n);
     for (int i = n - 1; i >= 0; --i) {
-        double s = A.row(i).segment(i + 1, n - i - 1)
+        double s = M.row(i).segment(i + 1, n - i - 1)
                          .dot(x.segment(i + 1, n - i - 1));
-        x(i) = (b(i) - s) / A(i, i);
+        x(i) = (b(i) - s) / M(i, i);
     }
     return x;
 }
@@ -81,8 +81,8 @@ Matrix randomSystem(int n, unsigned seed)
     if (n <= 0 || n > 4'000)
         throw std::invalid_argument("n out of range (1‒4000)");
 
-    std::mt19937 gen(seed);
-    std::uniform_real_distribution<> dist(-10, 10);
+    mt19937 gen(seed);
+    uniform_real_distribution<> dist(-10, 10);
 
     Matrix M(n, n + 1);
     for (int i = 0; i < M.size(); ++i) M(i) = dist(gen);
